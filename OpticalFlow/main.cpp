@@ -3,12 +3,12 @@
 /// </summary>
 /// <returns></returns>
 /// --------------------------------------------------------------------
-/// ´´½¨ÈÕÆÚ£º2018/10/29  11:05
-/// ´´½¨Õß£ºÍõÏÈÎÄ
-/// ÓÊÏä£ºwangxianwenup@outlook.com
-/// ËùÓÃÉè±¸£ºWindows10 64bit + VisualStudio 2017
-/// ¸ü¸ÄÈÕÆÚ£º
-/// ¸ÅÊö£ºÀûÓÃ¹âÁ÷·¨½øĞĞÔË¶¯Ä¿±ê¼ì²â
+/// åˆ›å»ºæ—¥æœŸï¼š2018/10/29  11:05
+/// åˆ›å»ºè€…ï¼šçƒ­å¤
+/// é‚®ç®±ï¼šwangxianwenup@outlook.com
+/// æ‰€ç”¨è®¾å¤‡ï¼šWindows10 64bit + VisualStudio 2017
+/// æ›´æ”¹æ—¥æœŸï¼š
+/// æ¦‚è¿°ï¼šåˆ©ç”¨å…‰æµæ³•è¿›è¡Œè¿åŠ¨ç›®æ ‡æ£€æµ‹
 /// --------------------------------------------------------------------
 
 #include<opencv2/video/video.hpp>
@@ -21,39 +21,39 @@
 using namespace std;
 using namespace cv;
 
-//--------ÉùÃ÷È«¾Öº¯Êı------------
+//--------å£°æ˜å…¨å±€å‡½æ•°------------
 void tracking(Mat &frame,Mat &output);
 bool addNewPoints();
 bool acceptTrackedPoint(int i);
 
-//--------ÉùÃ÷È«¾Ö±äÁ¿------------
-string window_name = "optical flow tracking ¹âÁ÷¼ì²â";
-Mat gray;		//µ±Ç°Í¼Æ¬
-Mat gray_prev;	//Ô¤²âÍ¼Æ¬
+//--------å£°æ˜å…¨å±€å˜é‡------------
+string window_name = "optical flow tracking å…‰æµæ£€æµ‹";
+Mat gray;		//å½“å‰å›¾ç‰‡
+Mat gray_prev;	//é¢„æµ‹å›¾ç‰‡
 
-vector<Point2f> points[2];		//point0ÎªÌØÕ÷µãµÄÔ­À´Î»ÖÃ£¬point1ÎªÌØÕ÷µãµÄĞÂÎ»ÖÃ
-vector<Point2f> initial;		//³õÊ¼»¯¸ú×ÙµãµÄÎ»ÖÃ
-vector<Point2f> features;		//¼ì²âµÄÌØÕ÷
-int maxCount = 500;				//¼ì²âµÄ×î´óÌØÕ÷Êı
-double qLevel = 0.01;			//ÌØÕ÷¼ì²âµÄµÈ¼¶
-double minDest = 10.0;			//Á½ÌØÕ÷µãÖ®¼ä×îĞ¡µÄ¾àÀë
-vector<uchar> status;			//¸ú×ÙÌØÕ÷µÄ×´Ì¬£¬ÌØÕ÷µÄÁ÷·¢ÏÖÎª1£¬·ñÔòÎª0
+vector<Point2f> points[2];		//point0ä¸ºç‰¹å¾ç‚¹çš„åŸæ¥ä½ç½®ï¼Œpoint1ä¸ºç‰¹å¾ç‚¹çš„æ–°ä½ç½®
+vector<Point2f> initial;		//åˆå§‹åŒ–è·Ÿè¸ªç‚¹çš„ä½ç½®
+vector<Point2f> features;		//æ£€æµ‹çš„ç‰¹å¾
+int maxCount = 500;				//æ£€æµ‹çš„æœ€å¤§ç‰¹å¾æ•°
+double qLevel = 0.01;			//ç‰¹å¾æ£€æµ‹çš„ç­‰çº§
+double minDest = 10.0;			//ä¸¤ç‰¹å¾ç‚¹ä¹‹é—´æœ€å°çš„è·ç¦»
+vector<uchar> status;			//è·Ÿè¸ªç‰¹å¾çš„çŠ¶æ€ï¼Œç‰¹å¾çš„æµå‘ç°ä¸º1ï¼Œå¦åˆ™ä¸º0
 vector<float> err;
 
-//--------helpº¯Êı ´òÓ¡³ÌĞòµÄËµÃ÷-----------
+//--------helpå‡½æ•° æ‰“å°ç¨‹åºçš„è¯´æ˜-----------
 static void help()
 {
-	//Êä³ö»¶Ó­ĞÅÏ¢ºÍOpenCV°æ±¾
-	cout << "\n\n\t\t\tÓÃ¹âÁ÷·¨¼ì²âÔË¶¯Ä¿±ê\n"
+	//è¾“å‡ºOpenCVç‰ˆæœ¬
+	cout << "\n\n\t\t\tç”¨å…‰æµæ³•æ£€æµ‹è¿åŠ¨ç›®æ ‡\n"
 		
-		<< "\n\n\t\t\t   µ±Ç°Ê¹ÓÃµÄOpenCV°æ±¾Îª£º" << CV_VERSION
+		<< "\n\n\t\t\t   å½“å‰ä½¿ç”¨çš„OpenCVç‰ˆæœ¬ä¸ºï¼š" << CV_VERSION
 		<< "\n\n  ----------------------------------------------------------------------------";
 }
 
 
 
 
-//-------mainº¯Êı ³ÌĞòÈë¿Ú-------------------
+//-------mainå‡½æ•° ç¨‹åºå…¥å£-------------------
 int main()
 {
 	Mat frame;
@@ -68,9 +68,9 @@ int main()
 		while (true)
 		{
 			capture >> frame;
-			if (!frame.empty())             //²»Îª¿Õ
+			if (!frame.empty())             //ä¸ä¸ºç©º
 			{
-				tracking(frame, result);     //¸ú×Ù
+				tracking(frame, result);     //è·Ÿè¸ª
 
 			}
 			else
@@ -92,15 +92,15 @@ int main()
 
 	return 0;
 }
-//--------trackingº¯Êı  ¸ú×ÙÔË¶¯Ä¿±ê------------------
-//	frame£ºÊäÈëµÄÊÓÆµÖ¡         output:ÓĞ¸ú×Ù½á¹ûµÄÊÓÆµÖ¡
+//--------trackingå‡½æ•°  è·Ÿè¸ªè¿åŠ¨ç›®æ ‡------------------
+//	frameï¼šè¾“å…¥çš„è§†é¢‘å¸§         output:æœ‰è·Ÿè¸ªç»“æœçš„è§†é¢‘å¸§
 
 void tracking(Mat &frame, Mat &output)
 {
 	cvtColor(frame, gray, CV_BGR2GRAY);
 	frame.copyTo(output);
 
-	//Ìí¼ÓÌØÕ÷µã
+	//æ·»åŠ ç‰¹å¾ç‚¹
 	if (addNewPoints())
 	{
 		goodFeaturesToTrack(gray, features, maxCount, qLevel, minDest);
@@ -111,9 +111,9 @@ void tracking(Mat &frame, Mat &output)
 	{
 		gray.copyTo(gray_prev);
 	}
-	//l-kÁ÷¹â·¨ÔË¶¯¹À¼Æ
+	//l-kæµå…‰æ³•è¿åŠ¨ä¼°è®¡
 	calcOpticalFlowPyrLK(gray_prev, gray, points[0], points[1], status, err);
-	//È¥µôÒ»Ğ©²»ºÃµÄÌØÕ÷µã
+	//å»æ‰ä¸€äº›ä¸å¥½çš„ç‰¹å¾ç‚¹
 	int k = 0;
 	for (size_t i = 0; i < points[1].size(); i++)
 	{
@@ -127,7 +127,7 @@ void tracking(Mat &frame, Mat &output)
 	}
 	points[1].resize(k);
 	initial.resize(k);
-	//ÏÔÊ¾ÌØÕ÷µãºÍÔË¶¯¹ì¼£
+	//æ˜¾ç¤ºç‰¹å¾ç‚¹å’Œè¿åŠ¨è½¨è¿¹
 	for (size_t i = 0; i < points[1].size(); i++)
 	{
 		line(output, initial[i], points[1][i], Scalar(0, 0, 255));
@@ -135,7 +135,7 @@ void tracking(Mat &frame, Mat &output)
 
 	}
 
-	//°Ñµ±Ç°¸ú×Ù½á¹û×÷ÎªÏÂÒ»´ÎµÄ²Î¿¼
+	//æŠŠå½“å‰è·Ÿè¸ªç»“æœä½œä¸ºä¸‹ä¸€æ¬¡çš„å‚è€ƒ
 	swap(points[1],points[0]);
 	swap(gray_prev,gray);
 
@@ -143,15 +143,15 @@ void tracking(Mat &frame, Mat &output)
 }
 
 
-//--------addNewPointsº¯Êı £º¼ì²âĞÂµêÊÇ·ñÓ¦¸Ã±»Ìí¼Ó----------------
-//	returnÊÇ·ñ±»Ìí¼ÓµÄ±êÖ¾
+//--------addNewPointså‡½æ•° ï¼šæ£€æµ‹æ–°åº—æ˜¯å¦åº”è¯¥è¢«æ·»åŠ ----------------
+//	returnæ˜¯å¦è¢«æ·»åŠ çš„æ ‡å¿—
 bool addNewPoints()
 {
-	return points[0].size() <= 10;       //points.size()ÇóĞĞÊı     points.size()ÇóÁĞÊı
+	return points[0].size() <= 10;       //points.size()æ±‚è¡Œæ•°     points.size()æ±‚åˆ—æ•°
 
 }
 
-//-------acceptTrackedPointº¯Êı£º¾ö¶¨ÄÄĞ©¸ú×Ùµã±»½ÓÊÕ-------------
+//-------acceptTrackedPointå‡½æ•°ï¼šå†³å®šå“ªäº›è·Ÿè¸ªç‚¹è¢«æ¥æ”¶-------------
 bool acceptTrackedPoint(int i)
 {
 	return status[i] && ((abs(points[0][i].x - points[1][i].x) + abs(points[0][i].y - points[1][i].y)) > 2);
